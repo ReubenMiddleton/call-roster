@@ -16,6 +16,65 @@ Newest first.
 
 ---
 
+## 2026-09-08 (session five) — The GitHub integration, and three things only running it revealed
+
+`call-roster` is public and the Claude GitHub App is live. Every finding below came from watching
+the thing run, not from reading its configuration — which had looked correct in all three cases.
+
+**Cost, since it was asked directly:** GitHub Actions minutes are free and unlimited on public
+repositories, and so are CodeQL, secret scanning and push protection. The `total_cost_usd: 0.086`
+printed by the action is an API-equivalent figure, not a charge: the docs are explicit that *"if
+you authenticate with an OAuth token, runs use your Claude subscription instead of API billing."*
+This repository authenticates with `CLAUDE_CODE_OAUTH_TOKEN` from `claude setup-token`, so runs
+draw on the existing subscription and add no separate bill. They do consume subscription usage.
+
+**⚠️ `Review` failed on all six of the first Dependabot pull requests, and on nothing else.** Since
+March 2021 a workflow triggered by Dependabot is treated as if it came from a fork: read-only token
+and **no access to Actions secrets**, only to separately-stored *Dependabot* secrets. So
+`CLAUDE_CODE_OAUTH_TOKEN` arrived empty every time. Fixed by skipping the actor rather than
+duplicating the secret into Dependabot's store — reviewing a lockfile bump against a constraint
+catalogue and a glossary is not worth a model call, and **a red X that always means "expected"
+teaches you to ignore the column that is meant to catch real problems.**
+
+**⚠️ The reviewer was posting nowhere.** The action starts the MCP server that creates inline PR
+comments only when `--allowedTools` names the tool; without it, findings go to the workflow run log
+and stop there. For a solo developer with no other reviewer that is indistinguishable from not
+running it. Now allowed and instructed to post. Verified on the very PR that fixed it: the run
+reached `clean: true` with the tool loaded, and correctly posted nothing, because the prompt says a
+clean review is one sentence and no inline comments.
+
+**A YAML trap worth remembering:** `claude_args: |` is a literal block scalar, so a `#` line inside
+it is an *argument passed to Claude Code*, not a comment. I wrote three comment lines in there;
+`check-workflows.mjs` passed and `js-yaml` parsed it happily, because it is valid YAML and only
+semantically wrong. Caught by dumping the parsed `claude_args` and looking at the resulting array.
+Commentary belongs above the key.
+
+**`/install-github-app` opens a PR, and half of it should be refused.** It generates `claude.yml`
+(the interactive `@claude` responder — genuinely new, kept) and `claude-code-review.yml`, which
+duplicates `claude-review.yml`'s trigger with a generic prompt knowing nothing about this project's
+data boundary, confidence tags, glossary or constraints, and asks for `pull-requests: read` so it
+cannot post properly anyway. Taking it would mean two reviewers on every PR, the worse one adding
+noise. Kept one file, dropped the other (PR #8, closing #7).
+
+**Dependency findings.** `#1` and `#2` were not broken — their branches predate the `setup-uv@v10`
+fix and needed only a rebase; the `Solver` failure read `Unable to resolve action
+astral-sh/setup-uv@v10`, nothing to do with the bumps. **`#3`/`#5` (vitest 5) are blocked upstream
+and were closed:** `@fast-check/vitest@0.4.1` is its own latest release and peers `vitest@"^4.1.0"`,
+so no combination of the two PRs resolves. `--legacy-peer-deps` was refused deliberately — that
+package powers the property-based tests in `lib/contract/request.test.ts` and
+`lib/contract/weekday.test.ts`, the solver contract boundary where an integer weekday means Monday
+on one side and Tuesday on the other with no error anywhere. An untested dependency resolution is
+exactly wrong there. Re-open when `@fast-check/vitest` ships vitest 5 support.
+
+**`publish:check` had a hole, found by the CA certificate landing in the repo root.** It counted
+`prod-ca-2021.crt` as publishable: its ignore list is deliberately a separate statement of the
+boundary rather than a `.gitignore` parser, and it knew about directories but not files. `.crt` is
+now in `SUSPICIOUS_EXTENSIONS` alongside the `.pem`/`.key`/`.p12` already there, the CA filenames
+are in a new `NEVER_PUBLISHED_FILES`, and the agreement check asserts `.gitignore` still carries
+`*.crt`. Verified both directions: the real CA is excluded, and a stray `.crt` under any other name
+fails the gate.
+---
+
 ## 2026-09-08 (session five) — Track B7 tooling, and an edited migration that had already drifted
 
 Preparing the Supabase click-through into something checkable. Two findings, both from measuring

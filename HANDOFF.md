@@ -60,7 +60,7 @@ Committing is still **the owner's call, every time.** Hooks installed: names + g
 
 | Exists and is tested | Does not exist |
 |---|---|
-| `lib/analytics/` — burden, load ratios, leximax, membership, capacity, workforce timeline | **The database schema exists and is verified** (`npm run db:check`) — **no Supabase project yet** (Track B7) |
+| `lib/analytics/` — burden, load ratios, leximax, membership, capacity, workforce timeline | **The schema is live on both Supabase projects** (`db:prod:verify` / `db:tester:verify`, 7/7) — **nothing writes to them yet** |
 | `lib/calendar/` — SA public holidays, the pattern-precedence resolver, and a month's days built from the calendar alone | **The API covers the full roster lifecycle, swaps, notifications (recorded), ICS feeds (working), a tenant-scoped burden schedule and auto-recalculating ledger** (`npm run api:check`) — **no WhatsApp delivery** |
 | `lib/export/render-html.ts` — the printable sheet, measured from the `.docx`. `npm run export:render`, or `render-export.ts --request … --solved …`. Detail in [`export.md`](docs/product/export.md) | **The editor UI** |
 | `solver/` — CP-SAT, elasticised, **20 of 21 constraints**, contract 1.7.0, 152 tests | **The editor UI.** `app/` is three scaffold files |
@@ -95,8 +95,8 @@ via a `SECURITY DEFINER` function solving a real RLS chicken-and-egg problem), a
 `.../ledger/recalculate` reusing `lib/analytics/{ledger,burden,equity}.ts` as-is. ✅ **The ledger
 reads each tenant's own burden schedule** (409 across a schedule-version change) and
 **recalculates automatically** on `PublishRoster`/`ApproveSwap`, never blocking. Notifications
-recorded, not sent (Track B6). `npm run api:check`, 60 assertions. **Next: B1 (`git init`, the
-public repo), the Supabase keep-alive ping, or L4/L6 below.**
+recorded, not sent (Track B6). `npm run api:check`, 60 assertions. **Next: the Supabase keep-alive ping
+(both projects pause after 7 days idle), or L4/L6 below.**
 
 ### 2–4. Then, in order
 
@@ -149,8 +149,8 @@ D05). Nothing here can detect that — only the principal can.
 
 | # | Task | Note |
 |---|---|---|
-| **B1** | Create the public repo, `git init`, first commit, push | ✅ **DONE 8 Sept** — [ReubenMiddleton/call-roster](https://github.com/ReubenMiddleton/call-roster), public, CI green on `main`, hooks installed. ⚠️ **6 Dependabot PRs open, and #3 + #5 must merge together** (`@vitest/coverage-v8` and `vitest` both to 5.0.0 — either alone is a peer mismatch; #3's CI already fails on install) |
-| **B3** | Claude GitHub App, `CLAUDE_CODE_OAUTH_TOKEN` secret, CodeQL default setup, secret scanning, push protection | 🔄 **Mostly done 8 Sept**: CodeQL default setup (5 languages), secret scanning, push protection and Dependabot security updates all **on**. ⚠️ **Owner-only remainder**: install the Claude GitHub App and add the `CLAUDE_CODE_OAUTH_TOKEN` secret (`claude setup-token`) — until then `claude-review.yml` and `claude-ci-watch.yml` cannot run |
+| **B1** | Create the public repo, `git init`, first commit, push | ✅ **DONE 8 Sept** — [ReubenMiddleton/call-roster](https://github.com/ReubenMiddleton/call-roster), public, CI green on `main`. Dependabot: #4/#6 merged; **#3/#5 closed — vitest 5 is blocked upstream** (`@fast-check/vitest` peers `vitest@^4`, no release supports 5); #1/#2 rebasing |
+| **B3** | Claude GitHub App, `CLAUDE_CODE_OAUTH_TOKEN` secret, CodeQL default setup, secret scanning, push protection | ✅ **DONE 8 Sept.** App installed, secret set, **verified by running it** — `claude-ci-watch` reached `success`/`num_turns: 2` and stayed silent on a green `main`; `claude-review` reached `clean: true` on PR #8. CodeQL (5 languages), secret scanning, push protection all on. ⚠️ **Review skips Dependabot on purpose** — those runs get no Actions secrets, so it can never work there |
 | **B5** | Skim the `docs/` tree and confirm the domain transcription | A misread constraint is far cheaper to catch here than after the solver ships |
 | **B6** | Start Meta WhatsApp business verification | ⏸️ Deferred until after a pilot month. 2–5 days typical, up to 30 |
 | **B7** | Create **two Supabase projects** — prod, and a synthetic-data tester environment | ✅ **DONE 8 Sept.** Both live on PG **17.6**, `eu-west-1`, migrated to `0017`, **7/7 green** on each — `npm run db:prod:verify` / `db:tester:verify`, **no default target on purpose**. Credentials in `.env.local` + `private/` only. ⚠️ **Still needed: the keep-alive ping** — both pause after 7 days idle and this is used monthly. See [`supabase-setup.md`](docs/ops/supabase-setup.md) |
