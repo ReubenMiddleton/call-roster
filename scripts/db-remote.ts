@@ -165,7 +165,13 @@ async function checkConnection(client: Client, url: string): Promise<void> {
     `${row?.session_user ?? '?'}${row?.su === true ? ' (a superuser -- so this is the local cluster, not Supabase)' : ' (not a superuser)'}`,
   );
 
-  if (hostname.includes('pooler.supabase.com')) {
+  // `endsWith` on a dotted suffix, never `includes` -- CodeQL's very first alert on this
+  // repository (js/incomplete-url-substring-sanitization, high) was the `includes` version of
+  // this line, which also matches `pooler.supabase.com.example.invalid`. Here it only selects a
+  // diagnostic message and the connection string comes from the developer's own `.env.local`, so
+  // nothing was exploitable -- but the predicate was simply wrong, and "it happens not to matter
+  // here" is how the same line survives being copied somewhere it does.
+  if (hostname.endsWith('.pooler.supabase.com')) {
     record(
       port !== '6543',
       'Connection mode',
