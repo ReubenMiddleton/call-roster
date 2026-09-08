@@ -29,7 +29,16 @@ jobs:
     timeout-minutes: 20
     # Skip drafts: a draft PR is work in progress and reviewing it wastes the budget and
     # trains the developer to ignore the output.
-    if: github.event.pull_request.draft == false
+    #
+    # Skip Dependabot too, for two independent reasons. First, it CANNOT work: since March 2021
+    # a workflow triggered by Dependabot is treated as if it came from a fork — read-only token,
+    # and no access to Actions secrets, only to separately-stored Dependabot secrets. So
+    # CLAUDE_CODE_OAUTH_TOKEN arrives empty and the job fails. Measured 2026-09-08: `Review`
+    # failed on all six of the repository's first Dependabot pull requests, and on nothing else.
+    # Second, even if it could work, reviewing a lockfile bump against a constraint catalogue and
+    # a glossary is not worth a model call. A red X that always means "expected" is worse than no
+    # check at all — it teaches you to ignore the column that is supposed to catch real problems.
+    if: github.event.pull_request.draft == false && github.actor != 'dependabot[bot]'
     steps:
       - uses: actions/checkout@v7
         with:
@@ -97,8 +106,23 @@ jobs:
             consequence: "a doctor can be assigned consecutive nights, which the principal
             confirmed is a real rule he applies" is useful; "violates H-04" is not.
 
+            POST YOUR FINDINGS ON THE PULL REQUEST. Use
+            mcp__github_inline_comment__create_inline_comment to leave each finding as an
+            inline comment on the line it concerns. Do not put findings only in the run log,
+            where nobody will read them.
+
             If the pull request is clean, say so in one sentence and stop. Do not pad a
-            clean review.
+            clean review, and do not leave inline comments saying a line is fine.
+          # ⚠️ `claude_args` is a literal block scalar: every line inside it is passed to Claude
+          # Code as a CLI argument, so a `#` line in there is an ARGUMENT, not a comment. Keep
+          # commentary out here, above the key.
+          #
+          # `mcp__github_inline_comment__create_inline_comment` is what makes the review visible.
+          # Without a posting tool named in --allowedTools the action never starts the MCP server
+          # that provides it, so the review lands in the workflow run log and nowhere else —
+          # which, for a solo developer with no other reviewer, is the same as not running it.
+          # Read/Glob/Grep remain the only other tools: this job reviews, it does not edit, and
+          # `permissions:` above grants it no write access to contents.
           claude_args: |
             --max-turns 25
-            --allowedTools "Read,Glob,Grep"
+            --allowedTools "Read,Glob,Grep,mcp__github_inline_comment__create_inline_comment"
