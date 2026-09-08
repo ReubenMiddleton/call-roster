@@ -129,6 +129,17 @@ what made the one exception easy to miss.
 and `vitest` both to 5.0.0. Merging either alone is a peer mismatch, and #3's CI already fails on
 install proving it.
 
+**CodeQL earned its place within the hour, on code written the same day.** Its first and only
+alert — `js/incomplete-url-substring-sanitization`, high — was
+`hostname.includes('pooler.supabase.com')` in `db-remote.ts`, which also matches
+`pooler.supabase.com.example.invalid`. Nothing was exploitable: the value selects a diagnostic
+message, and the connection string comes from the developer's own gitignored `.env.local`. Fixed
+anyway with `endsWith('.pooler.supabase.com')`, because the predicate was wrong and *"it happens
+not to matter here"* is precisely how such a line survives being copied somewhere it does. Zero
+open alerts after the fix. Worth recording as the answer to "is default-setup CodeQL worth it on a
+small repo" — one real finding, day one, in fresh code that had already passed a fourteen-step
+local gate and a human read.
+
 ### ✅ Track B7 done — and `0017`, the migration only a managed host could have asked for
 
 Both projects up on **PostgreSQL 17.6**, migrated and passing all seven checks. The whole case for
