@@ -97,6 +97,38 @@ integration overview), unlike region and Postgres type — **no need to recreate
 it**, which is worth stating because a project was recreated that evening and its ref vanished
 from DNS mid-session, which is how the staleness was detected at all.
 
+### ✅ Tracks B1 and (most of) B3 — the repository is public
+
+[ReubenMiddleton/call-roster](https://github.com/ReubenMiddleton/call-roster), public, two commits,
+CI green on `main`. CodeQL default setup (actions, javascript, javascript-typescript, python,
+typescript), secret scanning, push protection and Dependabot security updates all enabled via the
+API. **Owner-only remainder**: the Claude GitHub App install and the `CLAUDE_CODE_OAUTH_TOKEN`
+secret — both need a browser OAuth flow, and without them `claude-review.yml` and
+`claude-ci-watch.yml` cannot run. `secret_scanning_non_provider_patterns` and
+`..._validity_checks` refuse to enable via the API and are left off.
+
+**`publish:check` and git disagreed by 8 files at `git init`, and chasing it found a real bug.**
+The script counted 266 publishable files against git's 258; the whole difference was
+`solver/.ruff_cache/`. `.gitignore` writes `.ruff_cache/` unanchored, which git matches at every
+level, but the script listed it only as a top-level directory name. Over-reporting is the safe
+direction — which is exactly why it would never have been noticed. Fixed by matching the tool
+caches at any depth; the two now agree **exactly**, which is a far stronger guarantee than either
+number alone. Same pass: `.crt` added to the suspicious-extension list (`.pem`, `.key` and `.p12`
+were already there and a `.crt` is the same family), the Supabase CA excluded by name, and a new
+assertion that `.gitignore` still carries the `*.crt` rule — the same two-independent-statements
+design the directories already had.
+
+**CI failed on the repository's first ever run**, on `astral-sh/setup-uv@v10`: that action
+publishes **no moving major-version tag** — `git/ref/tags/v10` is a 404, while `v10.0.0` and
+`v10.0.1` exist. The job died before executing a line. Pinned exactly and commented, because the
+obvious "tidy-up" is to shorten it back. The other four actions in these workflows (`checkout@v7`,
+`setup-node@v7`, `gitleaks-action@v3`, `claude-code-action@v1`) do publish major tags, which is
+what made the one exception easy to miss.
+
+⚠️ **Dependabot opened six PRs immediately, and two of them are a pair**: `@vitest/coverage-v8`
+and `vitest` both to 5.0.0. Merging either alone is a peer mismatch, and #3's CI already fails on
+install proving it.
+
 ### ✅ Track B7 done — and `0017`, the migration only a managed host could have asked for
 
 Both projects up on **PostgreSQL 17.6**, migrated and passing all seven checks. The whole case for

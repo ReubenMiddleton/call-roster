@@ -48,9 +48,9 @@ superuser that can `SET ROLE` and ignores default grants. 8 Sept: all 16 migrati
 and **every route would still have 500'd** (`0017`). Also run **`db:prod:verify`** and
 `db:tester:verify`. Migrations are **append-only** — `.claude/rules/migrations.md`.
 
-**Nothing has been committed. There is no `.git` directory** — `git init` is the owner's call,
-Track B1. **`npm run publish:check` answers "what would a push actually publish?" before the
-repository exists** — 253 files, nothing under `private/`, no images.
+✅ **Public repo live, CI green on `main`**: [ReubenMiddleton/call-roster](https://github.com/ReubenMiddleton/call-roster).
+`publish:check` and git now agree **exactly** — 258 files, nothing under `private/`, no images.
+Committing is still **the owner's call, every time.** Hooks installed: names + gitleaks on commit.
 
 ---
 
@@ -149,8 +149,8 @@ D05). Nothing here can detect that — only the principal can.
 
 | # | Task | Note |
 |---|---|---|
-| **B1** | Create the public repo, `git init`, first commit, push | **Run `npm run publish:check` first** — it lists exactly what would go up and fails on anything under `private/` or any image. Nothing is staged; that is deliberate |
-| **B3** | Claude GitHub App, `CLAUDE_CODE_OAUTH_TOKEN` secret, CodeQL default setup, secret scanning, push protection | All free on a public repo. This is what makes the authored workflows actually run |
+| **B1** | Create the public repo, `git init`, first commit, push | ✅ **DONE 8 Sept** — [ReubenMiddleton/call-roster](https://github.com/ReubenMiddleton/call-roster), public, CI green on `main`, hooks installed. ⚠️ **6 Dependabot PRs open, and #3 + #5 must merge together** (`@vitest/coverage-v8` and `vitest` both to 5.0.0 — either alone is a peer mismatch; #3's CI already fails on install) |
+| **B3** | Claude GitHub App, `CLAUDE_CODE_OAUTH_TOKEN` secret, CodeQL default setup, secret scanning, push protection | 🔄 **Mostly done 8 Sept**: CodeQL default setup (5 languages), secret scanning, push protection and Dependabot security updates all **on**. ⚠️ **Owner-only remainder**: install the Claude GitHub App and add the `CLAUDE_CODE_OAUTH_TOKEN` secret (`claude setup-token`) — until then `claude-review.yml` and `claude-ci-watch.yml` cannot run |
 | **B5** | Skim the `docs/` tree and confirm the domain transcription | A misread constraint is far cheaper to catch here than after the solver ships |
 | **B6** | Start Meta WhatsApp business verification | ⏸️ Deferred until after a pilot month. 2–5 days typical, up to 30 |
 | **B7** | Create **two Supabase projects** — prod, and a synthetic-data tester environment | ✅ **DONE 8 Sept.** Both live on PG **17.6**, `eu-west-1`, migrated to `0017`, **7/7 green** on each — `npm run db:prod:verify` / `db:tester:verify`, **no default target on purpose**. Credentials in `.env.local` + `private/` only. ⚠️ **Still needed: the keep-alive ping** — both pause after 7 days idle and this is used monthly. See [`supabase-setup.md`](docs/ops/supabase-setup.md) |
