@@ -1,0 +1,104 @@
+name: Claude PR review
+
+# The highest-value Action available on this project, by a distance: there is one
+# developer and no other reviewer, so this is the "adversarial review in a fresh context"
+# pattern running without consuming anyone's attention. See ADR-0002.
+#
+# Requires the Claude GitHub App installed on the repo and CLAUDE_CODE_OAUTH_TOKEN as a
+# repository secret — both are task B3. Until then this workflow is authored but inert.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: read
+  id-token: write
+
+concurrency:
+  group: claude-review-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    name: Review
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # Skip drafts: a draft PR is work in progress and reviewing it wastes the budget and
+    # trains the developer to ignore the output.
+    if: github.event.pull_request.draft == false
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          # The prompt is scoped deliberately narrowly. A reviewer prompted to "find
+          # problems" will report some even when the work is sound, and chasing every
+          # finding leads straight to over-engineering — which is a worse outcome for
+          # this project than a missed nit.
+          prompt: |
+            Review this pull request against the project's own documented rules. Read
+            CLAUDE.md and docs/README.md first, then only the focused documents relevant
+            to what the diff touches.
+
+            Report ONLY these five classes of finding:
+
+            1. DATA BOUNDARY — the highest severity. Any real doctor surname outside
+               private/; any fixture or test using real-looking names instead of D01..D15
+               codes; any second-order identification (a code plus enough context to
+               identify the person). This repository is public and the source material
+               concerns thirteen identifiable people who have not consented to
+               publication.
+
+            2. CONFIDENCE TAG INTEGRITY — any [ASSUMED], [INFERRED] or [UNKNOWN] promoted
+               to [CONFIRMED] without a recorded human source, and any [INFERRED]
+               constraint enforced rather than sitting behind a flag defaulting to off.
+
+            3. CONSTRAINT AND SPEC VIOLATIONS — an implementation that does not match the
+               EARS statement in docs/domain/constraints.md; a constraint ID used with no
+               catalogue entry; anything implemented that appears in the "Explicitly NOT
+               constraints" section. That last one matters: the practice accepts an 8-hour
+               turnaround, and a system that blocks it is unusable.
+
+            4. GLOSSARY VIOLATIONS — a domain term not in docs/product/glossary.md, or a
+               glossary term used with a different meaning. Watch for: rota/schedule
+               instead of roster; provider/resource/staff/employee instead of doctor
+               ("employee" is legally wrong here — these are independent contractors);
+               duty/session instead of shift; anything named Weekend, whose definition is
+               still unresolved.
+
+            5. CORRECTNESS BUGS — logic errors, off-by-one errors in date or day-index
+               arithmetic, incorrect null handling, and anything silencing
+               noUncheckedIndexedAccess with a non-null assertion `!` instead of
+               narrowing. A roster engine is arrays indexed by day and by doctor, so this
+               is where real bugs live.
+
+            Also flag a free-text field reachable from a preference, leave or availability
+            type, and any leave "reason" field or fatigue/wellness flag. Those would make
+            the system a processor of special personal information under POPIA s26, which
+            the whole compliance posture depends on avoiding.
+
+            DO NOT report:
+            - style, formatting or naming preferences (Biome and ESLint own those)
+            - missing tests for code the diff did not change
+            - speculative improvements not grounded in a documented requirement
+            - features that are deliberately out of scope (check the out-of-scope list in
+              docs/product/prd.md and the non-goals in docs/product/vision.md first)
+            - anything about the solver being incomplete: it ships last, on purpose
+
+            For each finding give the file, the line, the documented expectation, what the
+            code does instead, and the concrete consequence. Be specific about the
+            consequence: "a doctor can be assigned consecutive nights, which the principal
+            confirmed is a real rule he applies" is useful; "violates H-04" is not.
+
+            If the pull request is clean, say so in one sentence and stop. Do not pad a
+            clean review.
+          claude_args: |
+            --max-turns 25
+            --allowedTools "Read,Glob,Grep"

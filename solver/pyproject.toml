@@ -1,0 +1,59 @@
+[project]
+name = "call-roster-solver"
+version = "0.1.0"
+description = "Throwaway CP-SAT prototype for the call roster. Research, not product - see README.md."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "ortools>=9.15.6755",
+]
+
+[project.scripts]
+call-roster-solver = "call_roster_solver:main"
+
+[dependency-groups]
+dev = [
+    "hypothesis>=6.165.10",
+    "pytest>=9.1.1",
+    "ruff>=0.16.4",
+]
+
+[build-system]
+requires = ["uv_build>=0.12.6,<0.13.0"]
+build-backend = "uv_build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# Constraint IDs live in test names, so keep output showing them.
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle
+    "F",    # pyflakes
+    "I",    # isort
+    "N",    # pep8-naming
+    "UP",   # pyupgrade
+    "B",    # bugbear
+    "SIM",  # simplify
+    "RUF",  # ruff-specific
+    "ANN",  # annotations - the solver contract is the riskiest boundary here
+]
+ignore = [
+    # helpers.py is lifted essentially verbatim from OR-Tools' shift_scheduling_sat.py.
+    # Its signatures are wide by design and must not be "improved" - see that file's
+    # docstring for why. PLR0913 is not selected, so this is just a note.
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests assert on generated instances; annotating every local adds noise, not safety.
+#
+# N802 is suppressed deliberately and is NOT laziness: catalogued constraint IDs belong
+# in test names (test_H04_no_back_to_back_nights), so "implement AC-H04" and "why is
+# H-04 failing" are unambiguous and coverage is verifiable by grepping IDs. Lowercasing
+# them would break the one convention that ties the catalogue to the suite.
+"tests/**" = ["ANN001", "ANN201", "N802"]

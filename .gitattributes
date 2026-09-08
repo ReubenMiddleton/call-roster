@@ -1,0 +1,14 @@
+* text=auto eol=lf
+
+*.ps1 text eol=crlf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
+*.pdf binary
+
+# Generated, but committed on purpose (see docs/GRAPHIFY.md). Collapsed in diffs.
+graphify-out/graph.json linguist-generated=true
+graphify-out/manifest.json linguist-generated=true
+package-lock.json linguist-generated=true

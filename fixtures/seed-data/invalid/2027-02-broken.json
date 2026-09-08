@@ -1,0 +1,31 @@
+{
+  "month": "2027-02",
+  "source": "SYNTHETIC AND DELIBERATELY INVALID - do not fix. Used to prove the validator fails.",
+  "transcribedAt": "2026-08-26",
+  "verified": true,
+  "notes": "Deliberately broken. Contains: a doctor twice in one day (H-02 breach), a shift that is not part of the declared pattern, an undeclared missing shift, and far fewer days than February has.",
+  "days": [
+    {
+      "date": "2027-02-01",
+      "patternId": "A",
+      "assignments": { "std-morning": "D01", "std-afternoon": "D01", "std-night": "D02" }
+    },
+    {
+      "date": "2027-02-02",
+      "patternId": "A",
+      "assignments": {
+        "std-morning": "D03",
+        "std-afternoon": "D04",
+        "std-night": "D05",
+        "fri-early": "D06"
+      }
+    },
+    {
+      "date": "2027-02-03",
+      "patternId": "A",
+      "assignments": { "std-morning": "D07", "std-night": "D08" }
+    }
+  ],
+  "spillDays": [],
+  "anomalies": []
+}

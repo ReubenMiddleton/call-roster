@@ -1,0 +1,28 @@
+# Directories search tools must not read.
+#
+# This repo has no .git yet, and ripgrep only honours .gitignore inside a git
+# repository - so every grep was walking build output and the Hypothesis cache.
+# One .hypothesis constants file is a single 40-line JSON array of every string
+# literal in the solver, and it matched almost any domain search, entering
+# context for nothing.
+#
+# .ignore is honoured with or without git. Keep it in sync with .gitignore.
+
+.next/
+.tools/
+coverage/
+dist/
+node_modules/
+out/
+playwright-report/
+test-results/
+.hypothesis/
+.pytest_cache/
+.ruff_cache/
+__pycache__/
+graphify-out/cache/
+.venv/
+venv/
+
+# Not a directory, but a downloaded CA is a large base64 blob that matches almost any search.
+*.crt

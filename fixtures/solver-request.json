@@ -1,0 +1,357 @@
+{
+  "contractVersion": "1.7.0",
+  "solveRunId": "00000000-0000-4000-8000-000000000001",
+  "tenantId": "00000000-0000-4000-8000-0000000000aa",
+  "rosterId": "00000000-0000-4000-8000-0000000000bb",
+  "horizon": {
+    "start": "2026-09-01",
+    "end": "2026-09-30"
+  },
+  "timeBudgetSeconds": 30,
+  "doctors": [
+    {
+      "code": "D01",
+      "availableFrom": "2023-12-01",
+      "availableUntil": null,
+      "staffCategory": "independent_practitioner",
+      "cannotWork": [{ "dayClass": "saturday", "shiftKind": "night" }],
+      "maxShiftsPerWeekend": 2
+    },
+    {
+      "code": "D02",
+      "availableFrom": "2023-12-01",
+      "availableUntil": null,
+      "staffCategory": "independent_practitioner"
+    },
+    {
+      "code": "D03",
+      "availableFrom": "2023-12-01",
+      "availableUntil": null,
+      "staffCategory": "independent_practitioner"
+    },
+    {
+      "code": "D06",
+      "availableFrom": "2023-12-01",
+      "availableUntil": null,
+      "staffCategory": "independent_practitioner",
+      "maxShiftsPerMonth": 4
+    },
+    {
+      "code": "D07",
+      "availableFrom": "2024-08-01",
+      "availableUntil": null,
+      "staffCategory": "independent_practitioner"
+    }
+  ],
+  "days": [
+    {
+      "date": "2026-09-01",
+      "patternId": "A",
+      "isPublicHoliday": false,
+      "shifts": [
+        {
+          "shiftId": "std-morning",
+          "kind": "morning",
+          "start": "07:00",
+          "end": "15:00",
+          "burdenWeight": 1
+        },
+        {
+          "shiftId": "std-afternoon",
+          "kind": "afternoon",
+          "start": "15:00",
+          "end": "23:00",
+          "burdenWeight": 1
+        },
+        {
+          "shiftId": "std-night",
+          "kind": "night",
+          "start": "23:00",
+          "end": "07:00",
+          "endsNextDay": true,
+          "burdenWeight": 2.5
+        }
+      ]
+    },
+    {
+      "date": "2026-09-04",
+      "patternId": "B",
+      "isPublicHoliday": false,
+      "shifts": [
+        {
+          "shiftId": "fri-early",
+          "kind": "morning",
+          "start": "07:00",
+          "end": "12:00",
+          "burdenWeight": 1
+        },
+        {
+          "shiftId": "fri-midday",
+          "kind": "afternoon",
+          "start": "12:00",
+          "end": "17:00",
+          "burdenWeight": 1
+        },
+        {
+          "shiftId": "fri-evening",
+          "kind": "evening",
+          "start": "17:00",
+          "end": "23:00",
+          "burdenWeight": 1
+        },
+        {
+          "shiftId": "fri-night",
+          "kind": "night",
+          "start": "23:00",
+          "end": "07:00",
+          "endsNextDay": true,
+          "burdenWeight": 2.5
+        }
+      ]
+    },
+    {
+      "date": "2026-09-07",
+      "patternId": "C",
+      "isPublicHoliday": false,
+      "shifts": [
+        {
+          "shiftId": "red-longday",
+          "kind": "long-day",
+          "start": "07:00",
+          "end": "17:00",
+          "burdenWeight": 1.5
+        },
+        {
+          "shiftId": "red-evening",
+          "kind": "evening",
+          "start": "17:00",
+          "end": "23:00",
+          "burdenWeight": 1
+        },
+        {
+          "shiftId": "red-night",
+          "kind": "night",
+          "start": "23:00",
+          "end": "07:00",
+          "endsNextDay": true,
+          "burdenWeight": 2.5
+        }
+      ]
+    },
+    {
+      "date": "2026-09-24",
+      "patternId": "A",
+      "isPublicHoliday": true,
+      "shifts": [
+        {
+          "shiftId": "std-morning",
+          "kind": "morning",
+          "start": "07:00",
+          "end": "15:00",
+          "burdenWeight": 5
+        },
+        {
+          "shiftId": "std-afternoon",
+          "kind": "afternoon",
+          "start": "15:00",
+          "end": "23:00",
+          "burdenWeight": 5
+        },
+        {
+          "shiftId": "std-night",
+          "kind": "night",
+          "start": "23:00",
+          "end": "07:00",
+          "endsNextDay": true,
+          "burdenWeight": 5
+        }
+      ]
+    }
+  ],
+  "availability": [
+    {
+      "doctorCode": "D06",
+      "rules": [
+        {
+          "kind": "NO_WEEKDAY_BEFORE",
+          "hour": 17
+        }
+      ],
+      "derivedFrom": {
+        "shiftsObserved": 214,
+        "contradictions": 0
+      }
+    },
+    {
+      "doctorCode": "D07",
+      "rules": [
+        {
+          "kind": "NO_WEEKDAY_BEFORE",
+          "hour": 17,
+          "exceptWeekdays": ["MONDAY"]
+        }
+      ],
+      "derivedFrom": {
+        "shiftsObserved": 155,
+        "contradictions": 2
+      }
+    }
+  ],
+  "preferences": [
+    {
+      "doctorCode": "D06",
+      "type": "UNAVAILABLE",
+      "tentative": false,
+      "dates": ["2026-09-24"],
+      "shiftIds": null,
+      "sourceToken": "NOT"
+    },
+    {
+      "doctorCode": "D03",
+      "type": "PREFER_NOT",
+      "tentative": true,
+      "dates": ["2026-09-01"],
+      "shiftIds": ["std-night"],
+      "sourceToken": null
+    }
+  ],
+  "recurringSlots": [
+    {
+      "doctorCode": "D02",
+      "weekday": "MONDAY",
+      "shiftId": "std-night",
+      "validFrom": "2024-01-01",
+      "validUntil": null
+    },
+    {
+      "doctorCode": "D03",
+      "weekday": "TUESDAY",
+      "shiftId": "std-morning",
+      "validFrom": "2024-01-01",
+      "validUntil": null
+    }
+  ],
+  "slotShares": [
+    {
+      "doctorCode": "D01",
+      "weekday": "SATURDAY",
+      "shiftId": "std-morning",
+      "share": 0.38
+    },
+    {
+      "doctorCode": "D03",
+      "weekday": "SATURDAY",
+      "shiftId": "std-morning",
+      "share": 0.27
+    }
+  ],
+  "burdenLedger": [
+    {
+      "doctorCode": "D01",
+      "cumulativeBurden": 142.5,
+      "entitlement": 149.6,
+      "holidayBurden": 8,
+      "holidayEntitlement": 36
+    },
+    {
+      "doctorCode": "D02",
+      "cumulativeBurden": 138,
+      "entitlement": 144.9,
+      "holidayBurden": 20,
+      "holidayEntitlement": 36
+    },
+    {
+      "doctorCode": "D03",
+      "cumulativeBurden": 151.5,
+      "entitlement": 159.1,
+      "holidayBurden": 12,
+      "holidayEntitlement": 36
+    },
+    {
+      "doctorCode": "D06",
+      "cumulativeBurden": 96,
+      "entitlement": 100.8,
+      "holidayBurden": 16,
+      "holidayEntitlement": 24
+    },
+    {
+      "doctorCode": "D07",
+      "cumulativeBurden": 88.5,
+      "entitlement": 92.9
+    }
+  ],
+  "burdenWeights": {
+    "weekday_day": 1,
+    "weekday_night": 2.5,
+    "saturday": 3,
+    "sunday": 3.5,
+    "public_holiday": 5
+  },
+  "constraints": [
+    {
+      "id": "H-01",
+      "mode": "BLOCK",
+      "weight": 1000000
+    },
+    {
+      "id": "H-02",
+      "mode": "WARN",
+      "weight": 1000000
+    },
+    {
+      "id": "H-04",
+      "mode": "BLOCK",
+      "weight": 10000
+    },
+    {
+      "id": "H-05",
+      "mode": "BLOCK",
+      "weight": 10000
+    },
+    {
+      "id": "H-06",
+      "mode": "WARN",
+      "weight": 1
+    },
+    {
+      "id": "H-07",
+      "mode": "OFF",
+      "weight": 10000
+    },
+    {
+      "id": "H-10",
+      "mode": "WARN",
+      "weight": 2000000
+    },
+    {
+      "id": "S-01",
+      "mode": "WARN",
+      "weight": 100
+    },
+    {
+      "id": "S-05",
+      "mode": "WARN",
+      "weight": 100
+    },
+    {
+      "id": "S-06",
+      "mode": "WARN",
+      "weight": 80
+    }
+  ],
+  "lockedAssignments": [
+    {
+      "date": "2026-09-24",
+      "shiftId": "std-night",
+      "doctorCode": "D02"
+    }
+  ],
+  "previousPublished": [
+    {
+      "date": "2026-09-01",
+      "shiftId": "std-morning",
+      "doctorCode": "D03"
+    }
+  ],
+  "monthlyMinimumShifts": 2
+}

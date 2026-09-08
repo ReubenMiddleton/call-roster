@@ -1,0 +1,71 @@
+version: 2
+
+# `groups` is the load-bearing part of this file. Without grouping, a project with npm,
+# uv and GitHub Actions dependencies produces a steady trickle of individual PRs that
+# buries the ones that matter, and the developer stops reading them. One weekly PR per
+# ecosystem for non-major updates is reviewable; twenty separate ones are not.
+#
+# Majors are deliberately left ungrouped and separate: TypeScript and ESLint majors in
+# particular are pinned for documented reasons (typescript-eslint peers typescript
+# <6.1.0, and eslint-config-next's bundled plugin breaks on ESLint 10 — see
+# docs/DECISIONS.md). Those need reading individually, not merging in a batch.
+
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Africa/Johannesburg
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore"
+      include: scope
+    groups:
+      npm-minor-patch:
+        applies-to: version-updates
+        update-types: [minor, patch]
+    ignore:
+      # Pinned deliberately, with reasons in docs/DECISIONS.md. Dependabot should not
+      # keep proposing these; a human decides when the ecosystem has caught up.
+      - dependency-name: typescript
+        update-types: [version-update:semver-major]
+      - dependency-name: eslint
+        update-types: [version-update:semver-major]
+
+  - package-ecosystem: uv
+    directory: /solver
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Africa/Johannesburg
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore"
+      include: scope
+    groups:
+      solver-minor-patch:
+        applies-to: version-updates
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Africa/Johannesburg
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: "chore"
+    groups:
+      actions-all:
+        applies-to: version-updates
+        patterns: ["*"]
+
+  # No docker ecosystem entry yet. The solver will eventually be containerised for its
+  # scale-to-zero host (ADR-0005), and this is where that goes — but there is no
+  # Dockerfile today, and an entry pointing at nothing is noise in a config file that is
+  # meant to be read.

@@ -1,0 +1,200 @@
+{
+  "month": "2027-01",
+  "source": "SYNTHETIC - invented data, not a real roster. See README.md in this directory.",
+  "transcribedAt": "2026-08-26",
+  "verified": true,
+  "notes": "Synthetic fixture. Exercises all three patterns, a spill day, a declared missing-shift anomaly, and a public holiday falling on a Friday - which drops Pattern B, per docs/domain/holidays.md.",
+  "days": [
+    {
+      "date": "2027-01-01",
+      "patternId": "A",
+      "isPublicHoliday": true,
+      "holidayName": "New Year's Day",
+      "assignments": { "std-morning": "D01", "std-afternoon": "D02", "std-night": "D07" }
+    },
+    {
+      "date": "2027-01-02",
+      "patternId": "A",
+      "assignments": { "std-morning": "D03", "std-afternoon": "D04", "std-night": "D08" }
+    },
+    {
+      "date": "2027-01-03",
+      "patternId": "A",
+      "assignments": { "std-morning": "D05", "std-afternoon": "D09", "std-night": "D10" }
+    },
+    {
+      "date": "2027-01-04",
+      "patternId": "C",
+      "assignments": { "red-longday": "D01", "red-evening": "D11", "red-night": "D12" }
+    },
+    {
+      "date": "2027-01-05",
+      "patternId": "A",
+      "assignments": { "std-morning": "D02", "std-afternoon": "D03", "std-night": "D13" }
+    },
+    {
+      "date": "2027-01-06",
+      "patternId": "A",
+      "assignments": { "std-morning": "D04", "std-afternoon": "D01", "std-night": "D06" }
+    },
+    {
+      "date": "2027-01-07",
+      "patternId": "A",
+      "assignments": { "std-morning": "D05", "std-afternoon": "D02", "std-night": "D07" }
+    },
+    {
+      "date": "2027-01-08",
+      "patternId": "B",
+      "assignments": {
+        "fri-early": "D03",
+        "fri-midday": "D04",
+        "fri-evening": "D08",
+        "fri-night": "D09"
+      }
+    },
+    {
+      "date": "2027-01-09",
+      "patternId": "A",
+      "assignments": { "std-morning": "D01", "std-afternoon": "D10", "std-night": "D11" }
+    },
+    {
+      "date": "2027-01-10",
+      "patternId": "A",
+      "assignments": { "std-morning": "D02", "std-afternoon": "D12", "std-night": "D13" }
+    },
+    {
+      "date": "2027-01-11",
+      "patternId": "A",
+      "assignments": { "std-morning": "D03", "std-afternoon": "D05", "std-night": "D06" }
+    },
+    {
+      "date": "2027-01-12",
+      "patternId": "A",
+      "assignments": { "std-morning": "D04", "std-afternoon": "D01", "std-night": "D07" }
+    },
+    {
+      "date": "2027-01-13",
+      "patternId": "A",
+      "assignments": { "std-morning": "D02", "std-afternoon": "D03", "std-night": "D08" }
+    },
+    {
+      "date": "2027-01-14",
+      "patternId": "A",
+      "assignments": { "std-morning": "D05", "std-afternoon": "D04", "std-night": "D09" }
+    },
+    {
+      "date": "2027-01-15",
+      "patternId": "B",
+      "assignments": {
+        "fri-early": "D01",
+        "fri-midday": "D02",
+        "fri-evening": "D10",
+        "fri-night": "D11"
+      }
+    },
+    {
+      "date": "2027-01-16",
+      "patternId": "A",
+      "assignments": { "std-morning": "D03", "std-afternoon": "D12", "std-night": "D13" }
+    },
+    {
+      "date": "2027-01-17",
+      "patternId": "A",
+      "assignments": { "std-morning": "D04", "std-afternoon": "D06", "std-night": "D07" }
+    },
+    {
+      "date": "2027-01-18",
+      "patternId": "A",
+      "assignments": { "std-morning": "D05", "std-afternoon": "D01", "std-night": "D08" }
+    },
+    {
+      "date": "2027-01-19",
+      "patternId": "A",
+      "assignments": { "std-morning": "D02", "std-afternoon": "D03", "std-night": "D09" }
+    },
+    {
+      "date": "2027-01-20",
+      "patternId": "A",
+      "assignments": { "std-morning": "D04", "std-afternoon": "D05", "std-night": "D10" }
+    },
+    {
+      "date": "2027-01-21",
+      "patternId": "A",
+      "assignments": { "std-morning": "D01", "std-afternoon": "D02", "std-night": "D11" }
+    },
+    {
+      "date": "2027-01-22",
+      "patternId": "B",
+      "assignments": {
+        "fri-early": "D03",
+        "fri-midday": "D04",
+        "fri-evening": "D12",
+        "fri-night": "D13"
+      }
+    },
+    {
+      "date": "2027-01-23",
+      "patternId": "A",
+      "assignments": { "std-morning": "D05", "std-afternoon": "D06", "std-night": "D07" }
+    },
+    {
+      "date": "2027-01-24",
+      "patternId": "A",
+      "assignments": { "std-morning": "D01", "std-afternoon": "D08", "std-night": "D09" }
+    },
+    {
+      "date": "2027-01-25",
+      "patternId": "A",
+      "assignments": { "std-morning": "D02", "std-afternoon": "D10", "std-night": "D11" }
+    },
+    {
+      "date": "2027-01-26",
+      "patternId": "A",
+      "assignments": { "std-morning": "D03", "std-afternoon": "D12", "std-night": "D13" }
+    },
+    {
+      "date": "2027-01-27",
+      "patternId": "A",
+      "assignments": { "std-morning": "D04", "std-afternoon": "D05", "std-night": "D06" }
+    },
+    {
+      "date": "2027-01-28",
+      "patternId": "A",
+      "assignments": { "std-morning": "D01", "std-afternoon": "D02", "std-night": "D07" }
+    },
+    {
+      "date": "2027-01-29",
+      "patternId": "B",
+      "assignments": {
+        "fri-early": "D03",
+        "fri-midday": "D04",
+        "fri-evening": "D08",
+        "fri-night": "D09"
+      }
+    },
+    {
+      "date": "2027-01-30",
+      "patternId": "A",
+      "assignments": { "std-morning": "D05", "std-afternoon": "D10", "std-night": "D11" }
+    },
+    {
+      "date": "2027-01-31",
+      "patternId": "A",
+      "assignments": { "std-morning": "D01", "std-night": "D12" }
+    }
+  ],
+  "spillDays": [
+    {
+      "date": "2027-02-01",
+      "patternId": "A",
+      "assignments": { "std-morning": "D02", "std-afternoon": "D03", "std-night": "D13" }
+    }
+  ],
+  "anomalies": [
+    {
+      "date": "2027-01-31",
+      "kind": "missing-shift",
+      "detail": "SYNTHETIC. Exercises the declared-anomaly path: an unassigned shift is a warning rather than an error when it is declared here."
+    }
+  ]
+}

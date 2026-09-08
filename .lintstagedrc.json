@@ -1,0 +1,6 @@
+{
+  "*.{ts,tsx,mts,cts,js,jsx,mjs,cjs,json,jsonc,css,md}": [
+    "biome format --write --no-errors-on-unmatched"
+  ],
+  "*.{ts,tsx,mts,cts}": ["eslint --max-warnings=0 --no-warn-ignored"]
+}

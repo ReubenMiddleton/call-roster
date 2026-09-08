@@ -1,0 +1,98 @@
+name: Claude CI watch
+
+# A daily check that the default branch still builds, so a break does not sit unnoticed
+# over a weekend. If CI is green it does nothing — deliberately no "all clear" comment,
+# because a daily notification that says nothing trains you to ignore notifications.
+# If CI is red it diagnoses the failure and opens a pull request. It NEVER auto-merges.
+#
+# This is the closest thing a solo developer has to somebody noticing a broken build.
+# Copied from the sibling Granify repo's pattern; see ADR-0002.
+#
+# Requires the Claude GitHub App and CLAUDE_CODE_OAUTH_TOKEN (task B3). Inert until then.
+
+on:
+  schedule:
+    # 07:00 UTC = 09:00 South African Standard Time, so a break is found at the start of
+    # the working day rather than the end of it.
+    - cron: "0 7 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: read
+  actions: read
+  id-token: write
+
+jobs:
+  ci-watch:
+    name: Check the default branch
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: astral-sh/setup-uv@v10
+        with:
+          enable-cache: true
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - uses: anthropics/claude-code-action@v1
+        env:
+          # ⚠️ READ THIS BEFORE CHANGING ANYTHING HERE.
+          #
+          # GH_TOKEN is set as an *environment variable*, for read-only `gh` calls only.
+          #
+          # Do NOT add `github_token: ${{ secrets.GITHUB_TOKEN }}` as an *input* to the
+          # action below. Pushes made with the default GITHUB_TOKEN do not trigger
+          # downstream workflows on the resulting pull request, so the fix PR would
+          # arrive with no CI run on it — which defeats the entire purpose of this
+          # workflow, silently. The action authenticates its own pushes via the GitHub
+          # App, and that is what makes the PR's CI actually run.
+          GH_TOKEN: ${{ github.token }}
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            Check the most recent "CI" workflow run on the default branch:
+
+                gh run list --workflow=ci.yml --branch=main --limit=1
+
+            If it succeeded, do nothing further and end the run. Do not comment, do not
+            open an issue, do not open a pull request. Silence is the success signal.
+
+            If it failed:
+
+            1. Read the failure logs: `gh run view --log-failed`.
+            2. Diagnose the root cause by reading the relevant source. Note which job
+               failed — `web`, `solver` or `secrets` — because they have different
+               toolchains. The solver is Python via uv; the web app is Node.
+            3. Make the smallest reasonable fix. Do not touch unrelated code, and do not
+               refactor while you are in there.
+            4. Verify it locally before pushing:
+               - web: `npm ci && npm run check`
+               - solver: `cd solver && uv run ruff check . && uv run pytest -q`
+            5. Create a branch, commit with a Conventional Commit message explaining what
+               broke and why the fix addresses it, push, and open a pull request against
+               main.
+
+            HARD RULES:
+
+            - Do NOT merge the pull request. Leave it for the owner to review, even if CI
+              is green on it.
+            - Do NOT weaken a test, assertion, coverage threshold, strict compiler flag or
+              lint rule to make the build pass. If that appears to be the only fix, open
+              the PR with no code change and explain the situation in the description
+              instead — that is a decision for the owner, not for you.
+            - Do NOT put a real doctor name in anything. Use D01..D15 codes. If the
+              failure is in scripts/check-no-real-names.mjs, read it before touching it and
+              do not loosen the matching.
+            - Do NOT commit anything from private/, and do not create it.
+          claude_args: |
+            --max-turns 35
+            --allowedTools "Bash,Read,Edit,Write,Glob,Grep"

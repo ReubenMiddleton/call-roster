@@ -1,0 +1,50 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.10/schema.json",
+
+  // FORMATTER ONLY. Biome's linter stays off on purpose.
+  //
+  // Linting is ESLint 9 + typescript-eslint type-aware rules + eslint-config-next,
+  // because react-hooks/exhaustive-deps and the Next.js rule set have no Biome
+  // equivalent yet, and type-aware rules need the TypeScript program. Biome is here
+  // for speed on formatting, which is the part it wins at outright.
+  //
+  // Do not enable "linter" without recording the decision in docs/DECISIONS.md —
+  // two linters disagreeing about the same file is a worse problem than a slow one.
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100,
+    "lineEnding": "lf"
+  },
+  "linter": { "enabled": false },
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "trailingCommas": "all",
+      "semicolons": "always"
+    }
+  },
+  "json": {
+    "formatter": { "enabled": true },
+    "parser": { "allowComments": true }
+  },
+  "files": {
+    "includes": [
+      "**",
+      "!**/.next/**",
+      "!**/.tools/**",
+      "!**/coverage/**",
+      "!**/dist/**",
+      "!**/graphify-out/**",
+      "!**/node_modules/**",
+      "!**/private/**",
+      "!**/solver/**",
+      "!**/package-lock.json",
+      "!**/next-env.d.ts",
+      "!**/playwright-report/**",
+      "!**/test-results/**"
+    ]
+  }
+}

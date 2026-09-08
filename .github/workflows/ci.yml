@@ -1,0 +1,115 @@
+name: CI
+
+# The local gate (`npm run check`) is the primary control; this is the backstop that runs
+# it somewhere the developer cannot forget. See ADR-0002.
+#
+# Windows vs Linux, and why this file does not just call the setup scripts:
+# scripts/setup-uv.ps1 and scripts/setup-gitleaks.ps1 are PowerShell and pin Windows
+# binaries into .tools/, because the development machine is Windows. On ubuntu-latest we
+# use the upstream actions instead. That is a deliberate divergence, not an oversight —
+# the scripts exist so the *developer's* toolchain is reproducible, and CI has its own
+# reproducibility story.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web:
+    name: Web (lint, typecheck, test, build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      # npm 11 gates install scripts. Three are approved in package.json under
+      # allowScripts (esbuild, lefthook, unrs-resolver) and all three are required for
+      # the toolchain to work at all — esbuild has no binary without its postinstall.
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Format check
+        run: npm run format:check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test with coverage
+        run: npm run test:coverage
+
+      - name: Build
+        run: npm run build
+
+      - name: Documentation drift
+        run: npm run docs:check
+
+      # NOTE: this is a no-op in CI, and that is by design rather than a gap.
+      # check-no-real-names.mjs reads the surname list from private/doctor-codes.md at
+      # runtime, and private/ is gitignored so it is never present here. The script
+      # detects that and exits 0 with an explanatory message.
+      #
+      # The real enforcement points are the lefthook pre-commit hook (which runs on the
+      # machine that actually holds the names) and GitHub push protection. Do not
+      # "improve" this by committing the name list to make CI enforce it — that would
+      # publish the exact data the check exists to protect.
+      - name: Data boundary (informational in CI — see comment)
+        run: npm run names:check
+
+  solver:
+    name: Solver (ruff, pytest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      # uv, not pip. The development machine has no system Python and the project's
+      # instructions never assume pip — keeping CI on uv keeps the two consistent.
+      - uses: astral-sh/setup-uv@v10
+        with:
+          enable-cache: true
+
+      - name: Lint
+        working-directory: solver
+        run: uv run ruff check .
+
+      - name: Format check
+        working-directory: solver
+        run: uv run ruff format --check .
+
+      # Hypothesis explores different inputs on each run by design, and prints the
+      # failing example plus a reproduction seed when a property breaks. A CI failure
+      # that does not reproduce locally is expected behaviour here, not a flake — copy
+      # the seed from the log.
+      - name: Test
+        working-directory: solver
+        run: uv run pytest -q
+
+  secrets:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
