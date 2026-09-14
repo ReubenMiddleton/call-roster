@@ -35,7 +35,7 @@ jobs:
           fetch-depth: 0
 
       # Exact version, not `@v10` — this action publishes no moving major tag. See ci.yml.
-      - uses: astral-sh/setup-uv@v10.0.1
+      - uses: astral-sh/setup-uv@v10.1.0
         with:
           enable-cache: true
 
